@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>محمد الششتاوي - تسجيل المبيعات</title>
+<style>
+  :root{
+    --ink:#1a2b3c;
+    --ink-soft:#4a5a6a;
+    --paper:#f7f5f0;
+    --card:#ffffff;
+    --line:#e2ddd2;
+    --accent:#0f6e5c;
+    --accent-dark:#0a4f42;
+    --danger:#b3402f;
+    --danger-bg:#fbeae6;
+    --gold:#b8893f;
+    --radius:14px;
+    --shadow: 0 2px 10px rgba(26,43,60,0.07);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Segoe UI', Tahoma, Arial, sans-serif;
+    min-height:100vh;
+    padding-bottom:90px;
+  }
+  header{
+    background:var(--accent-dark);
+    color:#fff;
+    padding:18px 16px 16px;
+    position:sticky;
+    top:0;
+    z-index:50;
+    box-shadow:var(--shadow);
+  }
+  header h1{margin:0; font-size:19px; font-weight:700;}
+  header .meta{font-size:13px; opacity:0.9; margin-top:4px; line-height:1.7;}
+  header .meta b{font-weight:700;}
+  header .sub{
+    font-size:13px; opacity:0.85; margin-top:6px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .date-pill{
+    background:rgba(255,255,255,0.15);
+    border-radius:20px; padding:4px 12px; font-weight:600; font-size:13px;
+  }
+  nav.tabs{
+    display:flex; background:var(--card); border-bottom:1px solid var(--line);
+    position:sticky; top:88px; z-index:49;
+  }
+  nav.tabs button{
+    flex:1; padding:13px 6px; background:none; border:none; font-size:14px;
+    font-weight:600; color:var(--ink-soft); border-bottom:3px solid transparent; cursor:pointer;
+  }
+  nav.tabs button.active{color:var(--accent-dark); border-bottom-color:var(--accent);}
+  main{padding:16px; max-width:560px; margin:0 auto;}
+  .card{
+    background:var(--card); border-radius:var(--radius); padding:18px;
+    box-shadow:var(--shadow); margin-bottom:16px;
+  }
+  label{
+    display:block; font-size:13px; font-weight:700; color:var(--ink-soft);
+    margin-bottom:6px; margin-top:14px;
+  }
+  label:first-child{margin-top:0;}
+  select, input{
+    width:100%; padding:14px 12px; font-size:16px; border:1.5px solid var(--line);
+    border-radius:10px; background:#fff; color:var(--ink); font-family:inherit;
+  }
+  select:focus, input:focus{outline:none; border-color:var(--accent);}
+  .item-info{
+    margin-top:10px; padding:12px; background:#f1f7f5; border-radius:10px;
+    border:1px solid #d6e8e3; font-size:14px; display:none;
+  }
+  .item-info.show{display:block;}
+  .item-info .name{font-weight:700; color:var(--accent-dark); margin-bottom:4px;}
+  .item-info .commission{color:var(--ink-soft); font-size:13px;}
+  .item-info.not-found{background:var(--danger-bg); border-color:#eccac3;}
+  .item-info.not-found .name{color:var(--danger);}
+  .op-toggle{display:flex; gap:8px; margin-top:6px;}
+  .op-toggle button{
+    flex:1; padding:13px; border-radius:10px; border:1.5px solid var(--line);
+    background:#fff; font-size:15px; font-weight:700; cursor:pointer; color:var(--ink-soft);
+  }
+  .op-toggle button.sel-sale{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .op-toggle button.sel-return{background:var(--danger); border-color:var(--danger); color:#fff;}
+  .qty-row{display:flex; align-items:center; gap:10px; margin-top:6px;}
+  .qty-row button{
+    width:46px; height:46px; border-radius:10px; border:1.5px solid var(--line);
+    background:#fff; font-size:22px; font-weight:700; color:var(--accent-dark); cursor:pointer;
+  }
+  .qty-row input{text-align:center; flex:1;}
+  .net-preview{margin-top:14px; text-align:center; font-size:14px; color:var(--ink-soft);}
+  .net-preview b{font-size:22px; color:var(--accent-dark);}
+  .net-preview.is-return b{color:var(--danger);}
+  .submit-btn{
+    width:100%; margin-top:18px; padding:16px; background:var(--accent); color:#fff;
+    border:none; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer;
+    box-shadow:0 4px 14px rgba(15,110,92,0.3);
+  }
+  .submit-btn:active{transform:scale(0.98);}
+  .submit-btn:disabled{background:#c9c4b8; box-shadow:none;}
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--accent-dark); color:#fff; padding:13px 24px; border-radius:30px;
+    font-size:14px; font-weight:600; opacity:0; transition:all 0.25s; z-index:100;
+    box-shadow:0 6px 18px rgba(0,0,0,0.2); white-space:nowrap; max-width:90vw; text-align:center;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .summary-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 4px; border-bottom:1px solid var(--line);
+  }
+  .summary-row:last-child{border-bottom:none;}
+  .summary-row .value{font-weight:700; font-size:16px; color:var(--accent-dark);}
+  .summary-row.negative .value{color:var(--danger);}
+  .grand-total{
+    background:linear-gradient(135deg, var(--accent-dark), var(--accent));
+    color:#fff; border-radius:var(--radius); padding:20px; text-align:center; margin-bottom:18px;
+  }
+  .grand-total .gt-label{font-size:13px; opacity:0.85;}
+  .grand-total .gt-value{font-size:32px; font-weight:800; margin-top:4px;}
+  .empty-state{text-align:center; color:var(--ink-soft); padding:40px 20px; font-size:14px;}
+  .log-item{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:12px 4px; border-bottom:1px solid var(--line); font-size:13px;
+  }
+  .log-item .l-main{flex:1;}
+  .log-item .l-name{font-weight:700; font-size:14px; margin-bottom:3px;}
+  .log-item .l-meta{color:var(--ink-soft); font-size:12px; line-height:1.6;}
+  .log-item .l-val{font-weight:700; font-size:15px; color:var(--accent-dark); white-space:nowrap; margin-right:8px;}
+  .log-item.is-return .l-val{color:var(--danger);}
+  .badge{display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; margin-right:4px;}
+  .badge.sale{background:#e3f2ee; color:var(--accent-dark);}
+  .badge.return{background:var(--danger-bg); color:var(--danger);}
+  .del-btn{background:none; border:none; color:#c0392b; font-size:18px; cursor:pointer; padding:4px 8px;}
+  .export-btn{
+    width:100%; padding:15px; background:var(--gold); color:#fff; border:none;
+    border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px;
+  }
+  .export-btn:disabled{background:#d8cdb5; cursor:default;}
+  .hint{font-size:12px; color:var(--ink-soft); text-align:center; margin-top:10px; line-height:1.6;}
+  .storage-warning{
+    background:#fff7e6; border:1px solid #f0d999; color:#8a6d1e; border-radius:10px;
+    padding:10px 12px; font-size:12px; line-height:1.6; margin-bottom:14px; display:none;
+  }
+  .storage-warning.show{display:block;}
+  ::-webkit-scrollbar{width:0;}
+
+  /* ===================== شاشة كلمة السر ===================== */
+  #lockScreen{
+    position:fixed; inset:0; background:var(--paper); z-index:1000;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  #lockScreen .lock-card{
+    background:var(--card); border-radius:var(--radius); padding:28px 22px;
+    box-shadow:var(--shadow); max-width:340px; width:100%; text-align:center;
+  }
+  #lockScreen h2{margin:0 0 6px; font-size:18px; color:var(--ink);}
+  #lockScreen p{margin:0 0 18px; font-size:13px; color:var(--ink-soft);}
+  #lockScreen input{
+    text-align:center; font-size:24px; letter-spacing:8px; padding:14px;
+    border:1.5px solid var(--line); border-radius:10px; width:100%;
+  }
+  #lockScreen .lock-error{
+    color:var(--danger); font-size:13px; margin-top:10px; min-height:18px;
+  }
+  #lockScreen button{
+    width:100%; margin-top:16px; padding:14px; background:var(--accent); color:#fff;
+    border:none; border-radius:10px; font-size:16px; font-weight:700; cursor:pointer;
+  }
+  body.locked > header, body.locked > nav.tabs, body.locked > main{ display:none !important; }
+
+  /* ===================== زرار تصوير الفاتورة ===================== */
+  .invoice-btn{
+    width:100%; padding:15px; background:#25D366; color:#fff; border:none;
+    border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; margin-top:10px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .invoice-btn svg{width:20px; height:20px; flex-shrink:0;}
+  .invoice-preview{
+    margin-top:10px; display:none; align-items:center; gap:10px;
+    padding:10px; background:#f1f7f5; border-radius:10px; border:1px solid #d6e8e3;
+  }
+  .invoice-preview.show{display:flex;}
+  .invoice-preview img{
+    width:56px; height:56px; object-fit:cover; border-radius:8px; flex-shrink:0;
+    border:1px solid var(--line);
+  }
+  .invoice-preview .ip-text{flex:1; font-size:13px; color:var(--accent-dark); font-weight:700;}
+  .invoice-preview .ip-remove{
+    background:none; border:none; color:var(--danger); font-size:18px; cursor:pointer; padding:4px 8px;
+  }
+
+  /* ===================== مودال تعليمات إرفاق الفاتورة ===================== */
+  #invoiceModal{
+    position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:900;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  #invoiceModal.show{display:flex;}
+  #invoiceModal .modal-card{
+    background:var(--card); border-radius:var(--radius); padding:24px 20px;
+    max-width:360px; width:100%; text-align:right;
+  }
+  #invoiceModal h3{margin:0 0 14px; font-size:17px; color:var(--accent-dark); text-align:center;}
+  #invoiceModal ol{margin:0 0 18px; padding-right:20px; font-size:14px; line-height:2; color:var(--ink);}
+  #invoiceModal ol li b{color:var(--accent-dark);}
+  #invoiceModal button{
+    width:100%; padding:14px; background:#25D366; color:#fff; border:none;
+    border-radius:10px; font-size:16px; font-weight:700; cursor:pointer;
+  }
+</style>
+</head>
+<body class="locked">
+
+<div id="lockScreen">
+  <div class="lock-card">
+    <h2>محمد الششتاوي</h2>
+    <p>اكتب كلمة السر الخاصة بيك للدخول</p>
+    <input type="password" id="lockPass" inputmode="numeric" maxlength="10" autocomplete="off" placeholder="••••">
+    <div class="lock-error" id="lockError"></div>
+    <button type="button" id="lockSubmit">دخول</button>
+  </div>
+</div>
+
+<header>
+  <h1>محمد الششتاوي</h1>
+  <div class="meta">المعرض: <b>مول الكريم</b> &nbsp;|&nbsp; المندوب: <b>تامر محمد عبد الفضيل فودة</b></div>
+  <div class="sub">
+    <span>تسجيل المبيعات والمرتجعات</span>
+    <span class="date-pill" id="todayPill">--</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="entry" type="button">تسجيل عملية</button>
+  <button class="tab-btn" data-tab="log" type="button">سجل اليوم</button>
+  <button class="tab-btn" data-tab="report" type="button">التقرير</button>
+</nav>
+
+<main>
+
+  <section id="tab-entry">
+    <div class="storage-warning" id="storageWarning">
+      تنبيه: التخزين الدائم مش متاح في طريقة الفتح دي، البيانات هتفضل محفوظة طول ما الصفحة مفتوحة بس. صدّر تقريرك بانتظام عشان ميضيعش حاجة.
+    </div>
+    <div class="card">
+      <label>كود الصنف</label>
+      <input type="text" id="inpCode" inputmode="numeric" placeholder="اكتب كود الصنف" autofocus>
+      <div class="item-info" id="itemInfo">
+        <div class="name" id="itemName"></div>
+        <div class="commission" id="itemComm"></div>
+      </div>
+
+      <label>نوع العملية</label>
+      <div class="op-toggle">
+        <button type="button" id="btnSale" class="sel-sale">بيع</button>
+        <button type="button" id="btnReturn">مرتجع</button>
+      </div>
+
+      <label>الكمية</label>
+      <div class="qty-row">
+        <button type="button" id="qtyMinus">−</button>
+        <input type="text" id="inpQty" inputmode="numeric" value="1">
+        <button type="button" id="qtyPlus">+</button>
+      </div>
+
+      <div class="net-preview" id="netPreview">العمولة المستحقة لهذه العملية: <b id="netVal">0</b> ج.م</div>
+
+      <label>صورة الفاتورة <span style="color:var(--danger);">(إجباري)</span></label>
+      <input type="file" id="invoiceFileInput" accept="image/*" style="display:none;">
+      <button class="invoice-btn" id="btnInvoice" type="button">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+        تصوير الفاتورة أو اختيارها من المعرض
+      </button>
+      <div class="invoice-preview" id="invoicePreview"></div>
+
+      <button class="submit-btn" id="btnSubmit" type="button" disabled>تسجيل العملية</button>
+      <div class="hint" id="submitHint">لازم ترفق صورة الفاتورة (تصوير أو من المعرض) قبل ما تقدر تسجل العملية.</div>
+    </div>
+  </section>
+
+  <section id="tab-log" style="display:none;">
+    <div class="card">
+      <h2 style="margin-top:0; font-size:15px; color:var(--gold);">عمليات النهاردة</h2>
+      <div id="todayLog"></div>
+    </div>
+  </section>
+
+  <section id="tab-report" style="display:none;">
+    <div class="grand-total">
+      <div class="gt-label">إجمالي العمولة المستحقة (كل الفترة)</div>
+      <div class="gt-value" id="grandTotal">0 ج.م</div>
+    </div>
+    <button class="export-btn" id="btnExport" type="button">تصدير تقرير إكسل (Excel)</button>
+    <div class="hint">الملف هيتنزل بصيغة Excel (.xlsx) شغالة على أي موبايل أو كمبيوتر. ابعته للمندوب آخر الشهر.</div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div id="invoiceModal">
+  <div class="modal-card">
+    <h3>📸 الصورة اتحفظت، خطوة وحدة باقية</h3>
+    <ol>
+      <li>هيفتح <b>واتساب</b> دلوقتي على رقم المندوب، ورسالة جاهزة مكتوبة</li>
+      <li>دوس على <b>دبوس الإرفاق 📎</b> جوه واتساب</li>
+      <li>اختار <b>"المعرض / الصور"</b> ودور على آخر صورة (اللي صورتها للتو)</li>
+      <li>دوسها وابعتها للمندوب</li>
+    </ol>
+    <button type="button" id="invoiceModalGo">تمام، فتح واتساب الآن</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ===================== شبكة أمان لأي خطأ غير متوقع ===================== */
+window.addEventListener('error', function(e){
+  try{
+    var box = document.createElement('div');
+    box.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#b3402f;color:#fff;padding:14px;font-size:13px;z-index:9999;direction:rtl;text-align:right;';
+    box.textContent = 'حصل خطأ تقني: ' + (e && e.message ? e.message : 'غير معروف') + ' — لو ظهرت الرسالة دي ابعتها للمطور بنفس النص.';
+    document.body.insertBefore(box, document.body.firstChild);
+  }catch(_err){}
+});
+
+/* ===================== بيانات أساسية ===================== */
+var SELLER_NAME = "محمد الششتاوي";
+var EXH_NAME = "مول الكريم";
+var REP_NAME = "تامر محمد عبد الفضيل فودة";
+var SELLER_KEY = "mhmd_alshshtawy";
+var SELLER_PASSWORD = "1234";
+var REP_WHATSAPP = "201003769680";
+var STORAGE_KEY = "pos_seller_" + SELLER_KEY;
+var ITEMS = [{"code": "605005", "name": "مسطح ريال تك  - 4 شعلة - أستيل كامل مسنفر - غرف - حامل عريض - أشعال ذاتي - زجاج غطاء مرايا", "commission": 25}, {"code": "550101", "name": "نيو شيف 55 سم - المونيوم", "commission": 25}, {"code": "550102", "name": "نيو شيف 55 سم - نحاس", "commission": 25}, {"code": "600101", "name": "نيو شيف 60 سم - المونيوم", "commission": 25}, {"code": "600102", "name": "نيو شيف 60 سم - المونيوم - مروحة", "commission": 25}, {"code": "600103", "name": "نيو شيف 60 سم - نحاس", "commission": 25}, {"code": "600104", "name": "نيو شيف 60 سم - نحاس - مروحة", "commission": 25}, {"code": "600105", "name": "نيو شيف 60 سم - نحاس - مروحة - سميك", "commission": 25}, {"code": "800101", "name": "نيو شيف 80 سم - المونيوم", "commission": 30}, {"code": "800102", "name": "نيو شيف 80 سم - المونيوم - مروحة", "commission": 30}, {"code": "800103", "name": "نيو شيف 80 سم - نحاس - مروحة", "commission": 30}, {"code": "800104", "name": "نيو شيف 80 سم - نحاس - مروحة - سميك", "commission": 30}, {"code": "900101", "name": "نيو شيف 90 سم - المونيوم", "commission": 40}, {"code": "900102", "name": "نيو شيف 90 سم - المونيوم - مروحة", "commission": 40}, {"code": "900103", "name": "نيو شيف 90 سم - نحاس - مروحة", "commission": 40}, {"code": "900104", "name": "نيو شيف 90 سم - نحاس - مروحة - سميك", "commission": 40}, {"code": "550201", "name": "ليميتد 55 سم - نحاس - مروحة", "commission": 25}, {"code": "600201", "name": "ليميتد 60 سم - نحاس - مروحة", "commission": 25}, {"code": "600202", "name": "ليميتد 60 سم - نحاس - مروحة - كاست", "commission": 30}, {"code": "800201", "name": "ليميتد 80 سم - نحاس - مروحة", "commission": 40}, {"code": "800202", "name": "ليميتد 80 سم - نحاس - مروحة - كاست", "commission": 50}, {"code": "900201", "name": "ليميتد 90 سم - نحاس - مروحة", "commission": 50}, {"code": "900202", "name": "ليميتد 90 سم - نحاس - مروحة - كاست", "commission": 60}, {"code": "900203", "name": "ليميتد 90 سم - أسود - نحاس - مروحة", "commission": 50}, {"code": "900204", "name": "ليميتد 90 سم - نحاس - مروحة - حامل سميك", "commission": 50}, {"code": "600301", "name": "بيرو  60 سم - نحاس - مروحة", "commission": 25}, {"code": "600302", "name": "بيرو  توربو 60 سم - نحاس - مروحة", "commission": 25}, {"code": "600303", "name": "بيرو  60 سم - نحاس - مروحة - كاست", "commission": 30}, {"code": "800301", "name": "بيرو  80 سم - نحاس - مروحة", "commission": 40}, {"code": "800302", "name": "بيرو  80 سم - نحاس - مروحة - كاست", "commission": 50}, {"code": "900301", "name": "بيرو  90 سم - نحاس - مروحة", "commission": 50}, {"code": "900302", "name": "بيرو  توربو 90 سم - نحاس - مروحة", "commission": 50}, {"code": "900303", "name": "بيرو  90 سم - نحاس - مروحة - كاست", "commission": 60}, {"code": "600401", "name": "برايت 60 سم - نحاس - مروحة - حامل عريض", "commission": 30}, {"code": "600402", "name": "برايت 60 سم - نحاس - مروحة - كاست", "commission": 40}, {"code": "800401", "name": "برايت 80 سم - نحاس - مروحة - حامل عريض", "commission": 50}, {"code": "800402", "name": "برايت 80 سم - نحاس - مروحة - كاست", "commission": 60}, {"code": "800403", "name": "برايت 80 سم - نحاس - مروحة - كاست - ديجيتال", "commission": 60}, {"code": "900401", "name": "برايت 90 سم - نحاس - مروحة - حامل عريض", "commission": 60}, {"code": "900402", "name": "برايت 90 سم - خشبى ستيل - مفتاح ذهبى - نحاس - مروحة - حامل عريض", "commission": 60}, {"code": "900403", "name": "برايت 90 سم - بلاك ستيل - مفتاح ذهبى - نحاس - مروحة - حامل عريض", "commission": 60}, {"code": "900404", "name": "برايت 90 سم - نحاس - مروحة - حامل عريض - ديجيتال", "commission": 60}, {"code": "900405", "name": "برايت 90 سم - نحاس - مروحة - كاست", "commission": 75}, {"code": "900406", "name": "برايت 90 سم - نحاس - مروحة - كاست - ديجيتال", "commission": 75}, {"code": "900407", "name": "برايت 90 سم - خشبى ستيل - مفتاح ذهبى - نحاس - مروحة - كاست - ديجيتال", "commission": 75}, {"code": "900408", "name": "برايت 90 سم - بلاك ستيل - مفتاح ذهبى - نحاس - مروحة - كاست - ديجيتال", "commission": 75}, {"code": "900501", "name": "جولد 90 سم - نحاس - مروحة - حامل عريض", "commission": 60}, {"code": "900502", "name": "جولد 90 سم - نحاس - مروحة - حامل عريض - ديجيتال", "commission": 75}, {"code": "900503", "name": "جولد 90 سم - نحاس - مروحة - كاست", "commission": 75}, {"code": "900504", "name": "جولد 90 سم - نحاس - مروحة - كاست  - ديجيتال", "commission": 75}, {"code": "550601", "name": "تاون 55 سم - غرف - مروحة", "commission": 25}, {"code": "600601", "name": "تاون 60 سم - غرف - مروحة", "commission": 25}, {"code": "600602", "name": "تاون 60 سم -  غرف - مروحة - كاست", "commission": 30}, {"code": "800601", "name": "تاون 80 سم - غرف - مروحة", "commission": 40}, {"code": "800602", "name": "تاون 80 سم - غرف - مروحة - كاست", "commission": 50}, {"code": "900601", "name": "تاون 90 سم - غرف - مروحة", "commission": 50}, {"code": "900602", "name": "تاون 90 سم -  غرف - مروحة - كاست", "commission": 60}, {"code": "900603", "name": "تاون 90 سم - أسود - غرف - مروحة", "commission": 50}, {"code": "600701", "name": "ستون 60 سم - غرف - مروحة", "commission": 25}, {"code": "600702", "name": "ستون 60 سم - غرف - مروحة - كاست", "commission": 30}, {"code": "800701", "name": "ستون 80 سم - غرف - مروحة", "commission": 40}, {"code": "800702", "name": "ستون 80 سم - غرف - مروحة - كاست", "commission": 50}, {"code": "900701", "name": "ستون 90 سم - غرف - مروحة", "commission": 50}, {"code": "900702", "name": "ستون 90 سم - غرف - مروحة - كاست", "commission": 60}, {"code": "600801", "name": "روك 60 سم - غرف - مروحة - حامل عريض", "commission": 30}, {"code": "600802", "name": "روك 60 سم - غرف - مروحة - كاست", "commission": 40}, {"code": "600803", "name": "روك 60 سم - غرف - مروحة - كاست - ديجيتال", "commission": 50}, {"code": "600804", "name": "روك 60 سم - غرف - مروحة - كاست - ديجيتال - أمان كامل", "commission": 75}, {"code": "800801", "name": "روك 80 سم - غرف - مروحة - حامل عريض", "commission": 50}, {"code": "800802", "name": "روك 80 سم - غرف - مروحة - كاست", "commission": 60}, {"code": "800804", "name": "روك 80 سم - غرف - مروحة - كاست - ديجيتال", "commission": 60}, {"code": "800805", "name": "روك 80 سم - غرف - مروحة - كاست - ديجيتال - أمان كامل", "commission": 100}, {"code": "900801", "name": "روك 90 سم - غرف - مروحة - حامل عريض", "commission": 60}, {"code": "900802", "name": "روك 90 سم - غرف - مروحة - حامل عريض - ديجيتال", "commission": 75}, {"code": "900803", "name": "روك 90 سم - خشبى ستيل - مفتاح ذهبى - غرف - مروحة - حامل عريض - ديجيتال", "commission": 75}, {"code": "900804", "name": "روك 90 سم - أسود ستيل - مفتاح ذهبى - غرف - مروحة - حامل عريض - ديجيتال", "commission": 75}, {"code": "900805", "name": "روك 90 سم - غرف - مروحة - كاست - ديجيتال", "commission": 75}, {"code": "900806", "name": "روك 90 سم - خشبى ستيل - مفتاح ذهبى - غرف - مروحة - كاست - ديجيتال", "commission": 75}, {"code": "900807", "name": "روك 90 سم - أسود ستيل - مفتاح ذهبى - غرف - مروحة - كاست - ديجيتال", "commission": 75}, {"code": "900808", "name": "روك 90 سم - غرف  - مروحة - حامل عريض - ديجيتال - أمان كامل", "commission": 100}, {"code": "900809", "name": "روك 90 سم - أسود ستيل - مفتاح ذهبى - غرف - مروحة - حامل عريض - ديجيتال - أمان كامل", "commission": 100}, {"code": "900810", "name": "روك 90 سم - غرف - مروحة - كاست - ديجيتال - أمان كامل", "commission": 100}, {"code": "900811", "name": "روك 90 سم - أسود ستيل - مفتاح ذهبى - غرف - مروحة - كاست - ديجيتال - أمان كامل", "commission": 100}, {"code": "601301", "name": "تورينو 60 سم - غرف أيطالى - مروحة - كاست - باب ايزى كلين - شبك جوانب للفرن", "commission": 50}, {"code": "601302", "name": "تورينو 60 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن", "commission": 50}, {"code": "601303", "name": "تورينو  60 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 75}, {"code": "801301", "name": "تورينو  80 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن", "commission": 60}, {"code": "801302", "name": "تورينو  80 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 100}, {"code": "901301", "name": "تورينو  90 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن", "commission": 75}, {"code": "901302", "name": "تورينو  90 سم - خشبى ستيل - مفتاح ذهبى - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن", "commission": 75}, {"code": "901303", "name": "تورينو  90 سم - أسود ستيل - مفتاح ذهبى - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن", "commission": 75}, {"code": "901304", "name": "تورينو  90 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 100}, {"code": "901305", "name": "تورينو  90 سم - أسود ستيل - مفتاح ذهبى - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 100}, {"code": "900901", "name": "آرت جولد  90 سم -  غرف أيطالى - مروحة - حامل عريض - باب ايزى كلين - شبك جوانب للفرن", "commission": 75}, {"code": "900902", "name": "آرت جولد  90 سم -  غرف أيطالى - مروحة - حامل عريض - ديجيتال - باب ايزى كلين - شبك جوانب للفرن", "commission": 75}, {"code": "900903", "name": "آرت جولد  90 سم -  غرف أيطالى - مروحة - كاست - باب ايزى كلين - شبك جوانب للفرن", "commission": 100}, {"code": "900904", "name": "آرت جولد  90 سم -  غرف أيطالى - مروحة - كاست  - ديجيتال - باب ايزى كلين - شبك جوانب للفرن", "commission": 100}, {"code": "900905", "name": "آرت جولد  90 سم -  غرف أيطالى - مروحة - حامل عريض - ديجيتال - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 100}, {"code": "900906", "name": "آرت جولد  90 سم -  غرف أيطالى - مروحة - كاست  - ديجيتال - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 100}, {"code": "901001", "name": "سمارت 90 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 175}, {"code": "901003", "name": "سمارت 90 سم - غرف أيطالى - مروحة - كاست - شاشة تاتش - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 175}, {"code": "601101", "name": "ليون 60 سم - غرف أيطالى - مروحة - كاست ايطالى  - ديجيتال  - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 75}, {"code": "601102", "name": "ليون 60 سم - غرف أيطالى - مروحة - كاست ايطالى  - شاشة تاتش  - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 100}, {"code": "801101", "name": "ليون 80 سم - غرف أيطالى - مروحة - كاست ايطالى  - ديجيتال  - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 100}, {"code": "801102", "name": "ليون 80 سم - غرف أيطالى - مروحة - كاست ايطالى  - شاشة تاتش  - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 150}, {"code": "901101", "name": "ليون 90 سم - غرف أيطالى  - مروحة - حامل عريض  - باب ايزى كلين - شبك جوانب للفرن", "commission": 100}, {"code": "901102", "name": "ليون 90 سم - غرف أيطالى - مروحة - حامل عريض - ديجيتال  - باب ايزى كلين - شبك جوانب للفرن", "commission": 100}, {"code": "901103", "name": "ليون 90 سم - غرف أيطالى - مروحة - كاست أيطالى  - ديجيتال  - باب ايزى كلين - شبك جوانب للفرن", "commission": 100}, {"code": "901104", "name": "ليون 90 سم - غرف أيطالى - مروحة - كاست ايطالى  - ديجيتال  - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 175}, {"code": "901105", "name": "ليون 90 سم - غرف أيطالى - مروحة - كاست ايطالى  - ديجيتال - سنسور  - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 175}, {"code": "901106", "name": "ليون 90 سم - غرف أيطالى - مروحة - كاست ايطالى  - شاشة تاتش  - باب ايزى كلين - شبك جوانب للفرن - أمان كامل", "commission": 175}, {"code": "602402", "name": "بلاك ستيل 60 سم - غرف أيطالى - مروحة - كاست - شاشة تاتش - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل", "commission": 100}, {"code": "802402", "name": "بلاك ستيل 80 سم - غرف أيطالى - مروحة - كاست - شاشة تاتش - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل", "commission": 150}, {"code": "902402", "name": "بلاك ستيل 90 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن", "commission": 100}, {"code": "902403", "name": "بلاك ستيل 90 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل", "commission": 175}, {"code": "902404", "name": "بلاك ستيل 90 سم - غرف أيطالى - مروحة - كاست - ديجيتال - سنسور - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل", "commission": 175}, {"code": "902405", "name": "بلاك ستيل 90 سم - غرف أيطالى - مروحة - كاست - شاشة تاتش - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل", "commission": 175}, {"code": "902406", "name": "بلاك ستيل 90 سم - غرف ايطالى - مروحة - كاست - سنسور- تاتش - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل", "commission": 200}, {"code": "902407", "name": "بلاك ستيل 90 سم - غرف ايطالى - مروحة - كاست - سنسور- تاتش - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل - أشعال مفتاح - فصل غاز ( كنترول ) - باسكت رول", "commission": 200}, {"code": "901201", "name": "برو 90 سم - غرف أيطالى - ستيل مسنفر - مروحة - كاست -  سنسور - تاتش -  باب ايزى كلين - شبك جوانب للفرن -      أمان كامل", "commission": 200}, {"code": "901202", "name": "برو 90 سم - غرف ايطالى - بلاك جولد ستيل - مروحة - كاست - سنسور- تاتش - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل", "commission": 200}, {"code": "901203", "name": "برو كنترول 90 سم - غرف أيطالى - ستيل مسنفر - مروحة - كاست -  سنسور - تاتش - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل - أشعال مفتاح - فصل غاز  ( كنترول ) - باسكت رول", "commission": 200}, {"code": "901204", "name": "برو كنترول 90 سم - غرف ايطالى - بلاك جولد  - مروحة - كاست - سنسور -تاتش -باب ايزى كلين - شبك جوانب للفرن -  أمان كامل  - أشعال مفتاح - فصل غاز ( كنترول ) - باسكت رول", "commission": 200}, {"code": "901406", "name": "شارك 90 سم - غرف أيطالى - ستيل - مروحة - كاست -  سنسور- تاتش - باب ايزى كلين - شبك جوانب للفرن -   أمان كامل - باب هيدروليك - اير فراير- مروحة تبريد - اشعال مفتاح - فصل غاز( كنترول )", "commission": 200}, {"code": "901407", "name": "شارك 90 سم - غرف ايطالى - بلاك جولد ستيل - مروحة - كاست - سنسور- تاتش - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل - باب هيدروليك - اير فراير- مروحة تبريد - اشعال مفتاح - فصل غاز( كنترول )", "commission": 200}, {"code": "901408", "name": "شارك 90 سم - غرف أيطالى نحاس - ستيل - مروحة - كاست -  سنسور- تاتش - باب ايزى كلين - شبك جوانب للفرن -   أمان كامل - باب هيدروليك - اير فراير- مروحة تبريد - اشعال مفتاح - فصل غاز( كنترول )", "commission": 200}, {"code": "901409", "name": "شارك 90 سم - غرف ايطالى نحاس - بلاك جولد ستيل - مروحة - كاست - سنسور- تاتش - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل - باب هيدروليك - اير فراير- مروحة تبريد - اشعال مفتاح - فصل غاز ( كنترول )", "commission": 200}, {"code": "552501", "name": "كلاسيك 55 سم - المونيوم ( قطعي )", "commission": 25}, {"code": "602501", "name": "كلاسيك 60 سم - المونيوم ( قطعي )", "commission": 25}, {"code": "602502", "name": "كلاسيك 60 سم - المونيوم - مروحة ( قطعي )", "commission": 25}, {"code": "802501", "name": "كلاسيك 80 سم - المونيوم ( قطعي )", "commission": 30}, {"code": "802502", "name": "كلاسيك 80 سم - المونيوم - مروحة ( قطعي )", "commission": 30}, {"code": "902501", "name": "كلاسيك 90سم - المونيوم ( قطعي )", "commission": 40}, {"code": "902502", "name": "كلاسيك 90 سم - المونيوم - مروحة ( قطعي )", "commission": 40}, {"code": "602201", "name": "بلس  60 سم - نحاس - مروحة ( قطعي )", "commission": 25}, {"code": "602202", "name": "بلس   60 سم - غرف - مروحة ( قطعي )", "commission": 25}, {"code": "802201", "name": "بلس   80 سم - نحاس - مروحة ( قطعي )", "commission": 40}, {"code": "802202", "name": "بلس   80 سم - غرف - مروحة ( قطعي )", "commission": 40}, {"code": "902201", "name": "بلس   90 سم - نحاس - مروحة ( قطعي )", "commission": 50}, {"code": "902202", "name": "بلس   90 سم - غرف - مروحة ( قطعي )", "commission": 50}, {"code": "902203", "name": "بلس   90 سم - أسود ستيل - نحاس - مروحة -  ( قطعي )", "commission": 50}, {"code": "902204", "name": "بلس   90 سم - أسود ستيل - غرف - مروحة -  ( قطعي )", "commission": 50}, {"code": "902101", "name": "ماجيك  90 سم -  غرف - مروحة - حامل عريض ( قطعي )", "commission": 50}, {"code": "902102", "name": "ماجيك  90 سم -  غرف - مروحة - كاست ( قطعي )", "commission": 60}, {"code": "902103", "name": "ماجيك  90 سم -  أسود ستيل  -  غرف - مروحة - حامل عريض ( قطعي )", "commission": 50}, {"code": "902104", "name": "ماجيك  90 سم -  أسود ستيل -  غرف - مروحة - كاست ( قطعي )", "commission": 60}, {"code": "902106", "name": "ماجيك  90 سم -  نحاس - مروحة - حامل عريض ( قطعي )", "commission": 50}, {"code": "902107", "name": "ماجيك  90 سم -  نحاس - مروحة - كاست ( قطعي )", "commission": 60}, {"code": "902108", "name": "ماجيك  90 سم -  أسود ستيل  -  نحاس - مروحة - حامل عريض ( قطعي )", "commission": 50}, {"code": "902109", "name": "ماجيك  90 سم -  أسود ستيل -  نحاس - مروحة - كاست ( قطعي )", "commission": 60}, {"code": "602301", "name": "دراجون 60 سم - نحاس - مروحة - حامل عريض ( قطعي )", "commission": 25}, {"code": "602303", "name": "دراجون 60 سم - نحاس - مروحة - كاست ( قطعي )", "commission": 30}, {"code": "602302", "name": "دراجون 60 سم - غرف - مروحة - حامل عريض ( قطعي )", "commission": 25}, {"code": "602304", "name": "دراجون 60 سم - غرف - مروحة - كاست ( قطعي )", "commission": 30}, {"code": "802301", "name": "دراجون 80 سم - نحاس - مروحة - حامل عريض ( قطعي )", "commission": 40}, {"code": "802303", "name": "دراجون 80 سم - نحاس - مروحة - كاست ( قطعي )", "commission": 50}, {"code": "802302", "name": "دراجون 80 سم - غرف - مروحة - حامل عريض ( قطعي )", "commission": 40}, {"code": "802304", "name": "دراجون 80 سم - غرف - مروحة - كاست ( قطعي )", "commission": 50}, {"code": "902301", "name": "دراجون 90 سم - نحاس - مروحة - حامل عريض ( قطعي )", "commission": 50}, {"code": "902303", "name": "دراجون 90 سم - نحاس - مروحة - كاست ( قطعي )", "commission": 60}, {"code": "902302", "name": "دراجون 90 سم - غرف - مروحة - حامل عريض ( قطعي )", "commission": 50}, {"code": "902304", "name": "دراجون 90 سم - غرف - مروحة - كاست ( قطعي )", "commission": 60}, {"code": "902305", "name": "دراجون 90 سم - أسود ستيل - نحاس - مروحة - حامل عريض ( قطعي )", "commission": 50}, {"code": "902306", "name": "دراجون 90 سم - أسود ستيل - نحاس - مروحة - كاست ( قطعي )", "commission": 60}, {"code": "902307", "name": "دراجون 90 سم - أسود ستيل - غرف - مروحة - حامل عريض ( قطعي )", "commission": 50}, {"code": "902308", "name": "دراجون 90 سم - أسود ستيل - غرف - مروحة - كاست ( قطعي )", "commission": 60}, {"code": "901306", "name": "تورينو  90 سم -  استيل مصنفر - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل - باسكت رول", "commission": 100}, {"code": "901107", "name": "ليون 90 سم - غرف أيطالى - مروحة - كاست ايطالى  - ديجيتال - باب ايزى كلين - شبك جوانب للفرن - أمان كامل - باسكت رول", "commission": 175}, {"code": "901108", "name": "ليون 90 سم - غرف أيطالى - مروحة - كاست ايطالى  - شاشة تاتش - باب ايزى كلين - شبك جوانب للفرن - أمان كامل - اير فراير", "commission": 175}, {"code": "902408", "name": "بلاك ستيل 90 سم - غرف أيطالى - مروحة - كاست - ديجيتال - باب ايزى كلين - شبك جوانب للفرن -  أمان كامل  - باسكت رول", "commission": 175}, {"code": "902409", "name": "بلاك ستيل 90 سم - غرف أيطالى - مروحة - كاست - شاشة تاتش - باب ايزى كلين - شبك جوانب للفرن  - أمان كامل - اير فراير", "commission": 175}, {"code": "901405", "name": "شارك 90 سم - غرف أيطالى - ستيل - مروحة - كاست -  سنسور- تاتش -  أمان كامل  - اير فراير- مروحة تبريد - اشعال مفتاح - فصل غاز", "commission": 200}];
+
+var itemMap = {};
+ITEMS.forEach(function(it){ itemMap[String(it.code).trim()] = it; });
+
+/* ===================== تخزين آمن (يعمل حتى لو localStorage محظور) ===================== */
+var storageAvailable = true;
+try{
+  var __t = '__storage_test__';
+  window.localStorage.setItem(__t, '1');
+  window.localStorage.removeItem(__t);
+}catch(e){
+  storageAvailable = false;
+}
+var memoryFallback = [];
+
+function loadData(){
+  if(!storageAvailable){ return memoryFallback.slice(); }
+  try{
+    var raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){
+    storageAvailable = false;
+    return memoryFallback.slice();
+  }
+}
+function saveData(arr){
+  memoryFallback = arr.slice();
+  if(!storageAvailable) return;
+  try{
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }catch(e){
+    storageAvailable = false;
+  }
+}
+var records = loadData();
+
+/* ===================== تواريخ ===================== */
+function todayStr(){
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function todayDisplay(){
+  var d = new Date();
+  var months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+/* ===================== عناصر DOM ===================== */
+var elPill = document.getElementById('todayPill');
+var elStorageWarning = document.getElementById('storageWarning');
+var elInpCode = document.getElementById('inpCode');
+var elItemInfo = document.getElementById('itemInfo');
+var elItemName = document.getElementById('itemName');
+var elItemComm = document.getElementById('itemComm');
+var elInpQty = document.getElementById('inpQty');
+var elQtyMinus = document.getElementById('qtyMinus');
+var elQtyPlus = document.getElementById('qtyPlus');
+var elNetPreview = document.getElementById('netPreview');
+var elNetVal = document.getElementById('netVal');
+var elBtnSale = document.getElementById('btnSale');
+var elBtnReturn = document.getElementById('btnReturn');
+var elBtnSubmit = document.getElementById('btnSubmit');
+var elToast = document.getElementById('toast');
+var elTodayLog = document.getElementById('todayLog');
+var elGrandTotal = document.getElementById('grandTotal');
+var elBtnExport = document.getElementById('btnExport');
+var elLockScreen = document.getElementById('lockScreen');
+var elLockPass = document.getElementById('lockPass');
+var elLockError = document.getElementById('lockError');
+var elLockSubmit = document.getElementById('lockSubmit');
+var elBtnInvoice = document.getElementById('btnInvoice');
+var elInvoiceFileInput = document.getElementById('invoiceFileInput');
+
+if(elPill) elPill.textContent = todayDisplay();
+if(!storageAvailable && elStorageWarning) elStorageWarning.classList.add('show');
+
+/* ===================== شاشة كلمة السر ===================== */
+var UNLOCK_KEY = 'pos_unlocked_' + SELLER_KEY;
+function tryUnlock(){
+  var unlockedBefore = false;
+  try{ unlockedBefore = window.localStorage.getItem(UNLOCK_KEY) === '1'; }catch(e){}
+  if(unlockedBefore){
+    document.body.classList.remove('locked');
+    elLockScreen.style.display = 'none';
+  }
+}
+tryUnlock();
+
+function attemptUnlock(){
+  var entered = elLockPass.value.trim();
+  if(entered === SELLER_PASSWORD){
+    document.body.classList.remove('locked');
+    elLockScreen.style.display = 'none';
+    try{ window.localStorage.setItem(UNLOCK_KEY, '1'); }catch(e){}
+  } else {
+    elLockError.textContent = 'كلمة السر غلط، حاول تاني';
+    elLockPass.value = '';
+    elLockPass.focus();
+  }
+}
+elLockSubmit.addEventListener('click', attemptUnlock);
+elLockPass.addEventListener('keypress', function(e){
+  if(e.key === 'Enter') attemptUnlock();
+});
+
+/* ===================== التابات ===================== */
+var tabButtons = document.querySelectorAll('.tab-btn');
+for(var ti=0; ti<tabButtons.length; ti++){
+  (function(btn){
+    btn.addEventListener('click', function(){
+      for(var j=0;j<tabButtons.length;j++){ tabButtons[j].classList.remove('active'); }
+      btn.classList.add('active');
+      var sections = document.querySelectorAll('main > section');
+      for(var k=0;k<sections.length;k++){ sections[k].style.display='none'; }
+      var tab = btn.getAttribute('data-tab');
+      var target = document.getElementById('tab-'+tab);
+      if(target) target.style.display='block';
+      if(tab==='log') renderTodayLog();
+      if(tab==='report') renderReport();
+    });
+  })(tabButtons[ti]);
+}
+
+/* ===================== نوع العملية ===================== */
+var opType = 'بيع';
+elBtnSale.addEventListener('click', function(){
+  opType='بيع';
+  elBtnSale.classList.add('sel-sale'); elBtnReturn.classList.remove('sel-return');
+  updatePreview();
+});
+elBtnReturn.addEventListener('click', function(){
+  opType='مرتجع';
+  elBtnReturn.classList.add('sel-return'); elBtnSale.classList.remove('sel-sale');
+  updatePreview();
+});
+
+/* ===================== كود الصنف ===================== */
+var currentItem = null;
+elInpCode.addEventListener('input', function(){
+  var code = elInpCode.value.trim();
+  if(!code){
+    elItemInfo.classList.remove('show','not-found');
+    currentItem = null;
+  } else {
+    var it = itemMap[code];
+    if(it){
+      currentItem = it;
+      elItemName.textContent = it.name;
+      elItemComm.textContent = 'عمولة القطعة: ' + it.commission + ' ج.م';
+      elItemInfo.classList.add('show');
+      elItemInfo.classList.remove('not-found');
+    } else {
+      currentItem = null;
+      elItemName.textContent = 'كود غير موجود';
+      elItemComm.textContent = 'راجع الكود مع المندوب';
+      elItemInfo.classList.add('show','not-found');
+    }
+  }
+  updatePreview();
+  validateForm();
+});
+
+/* ===================== الكمية ===================== */
+elQtyMinus.addEventListener('click', function(){
+  var v = parseInt(elInpQty.value,10) || 1;
+  if(v>1) v--;
+  elInpQty.value = v;
+  updatePreview();
+  validateForm();
+});
+elQtyPlus.addEventListener('click', function(){
+  var v = parseInt(elInpQty.value,10) || 1;
+  v++;
+  elInpQty.value = v;
+  updatePreview();
+  validateForm();
+});
+elInpQty.addEventListener('input', function(){
+  elInpQty.value = elInpQty.value.replace(/[^0-9]/g,'');
+  updatePreview();
+  validateForm();
+});
+
+function updatePreview(){
+  if(currentItem){
+    var qty = parseInt(elInpQty.value,10) || 0;
+    var net = currentItem.commission * qty;
+    if(opType==='مرتجع') net = -net;
+    elNetPreview.classList.toggle('is-return', net<0);
+    elNetPreview.innerHTML = (net<0 ? 'هيتخصم من العمولة: ' : 'العمولة المستحقة لهذه العملية: ') + '<b id="netVal">' + Math.abs(net) + '</b> ج.م';
+  } else {
+    elNetPreview.innerHTML = 'العمولة المستحقة لهذه العملية: <b id="netVal">0</b> ج.م';
+  }
+}
+
+function validateForm(){
+  var qty = parseInt(elInpQty.value,10) || 0;
+  var ok = !!currentItem && qty > 0 && !!pendingInvoiceDataUrl;
+  elBtnSubmit.disabled = !ok;
+  if(elSubmitHint){
+    if(!currentItem || qty<=0){
+      elSubmitHint.textContent = 'لازم ترفق صورة الفاتورة (تصوير أو من المعرض) قبل ما تقدر تسجل العملية.';
+    } else if(!pendingInvoiceDataUrl){
+      elSubmitHint.textContent = 'باقي خطوة: ارفق صورة الفاتورة عشان تقدر تسجل العملية.';
+    } else {
+      elSubmitHint.textContent = 'تمام، جاهز للتسجيل.';
+    }
+  }
+}
+
+/* ===================== تسجيل العملية ===================== */
+elBtnSubmit.addEventListener('click', function(){
+  if(!currentItem) return;
+  var qty = parseInt(elInpQty.value,10) || 0;
+  if(qty<=0) return;
+  if(!pendingInvoiceDataUrl){
+    showToast('لازم ترفق صورة الفاتورة الأول');
+    return;
+  }
+  var net = currentItem.commission * qty;
+  if(opType==='مرتجع') net = -net;
+
+  var rec = {
+    id: Date.now() + '_' + Math.random().toString(36).slice(2,7),
+    date: todayStr(),
+    opType: opType,
+    code: currentItem.code,
+    itemName: currentItem.name,
+    commission: currentItem.commission,
+    qty: qty,
+    net: net,
+    invoiceImage: pendingInvoiceDataUrl
+  };
+  records.push(rec);
+  saveData(records);
+
+  showToast(opType==='بيع' ? ('تم تسجيل البيع — ' + Math.abs(net) + ' ج.م عمولة') : ('تم تسجيل المرتجع — تم خصم ' + Math.abs(net) + ' ج.م'));
+
+  // إتاحة إرسال نفس الصورة على واتساب للمندوب (اختياري، مش شرط لإتمام التسجيل)
+  var message = 'فاتورة من ' + SELLER_NAME + ' - ' + EXH_NAME + ' - بتاريخ ' + todayStr();
+  pendingWaUrl = 'https://wa.me/' + REP_WHATSAPP + '?text=' + encodeURIComponent(message);
+  elInvoiceModal.classList.add('show');
+
+  elInpCode.value = '';
+  elInpQty.value = '1';
+  currentItem = null;
+  elItemInfo.classList.remove('show','not-found');
+  opType = 'بيع';
+  elBtnSale.classList.add('sel-sale'); elBtnReturn.classList.remove('sel-return');
+  pendingInvoiceDataUrl = null;
+  elInvoicePreview.classList.remove('show');
+  elInvoicePreview.innerHTML = '';
+  updatePreview();
+  validateForm();
+  elInpCode.focus();
+});
+
+function showToast(msg){
+  elToast.textContent = msg;
+  elToast.classList.add('show');
+  setTimeout(function(){ elToast.classList.remove('show'); }, 2400);
+}
+
+/* ===================== تصوير الفاتورة (إجباري) + إرسال اختياري على واتساب ===================== */
+var elInvoiceModal = document.getElementById('invoiceModal');
+var elInvoiceModalGo = document.getElementById('invoiceModalGo');
+var elInvoicePreview = document.getElementById('invoicePreview');
+var elSubmitHint = document.getElementById('submitHint');
+var pendingInvoiceDataUrl = null; // الصورة المضغوطة الحالية (base64) المرتبطة بالعملية الجارية
+var pendingWaUrl = null;
+
+elBtnInvoice.addEventListener('click', function(){
+  elInvoiceFileInput.click();
+});
+
+elInvoiceFileInput.addEventListener('change', function(){
+  if(!elInvoiceFileInput.files || elInvoiceFileInput.files.length === 0) return;
+  var file = elInvoiceFileInput.files[0];
+
+  compressImageFile(file, 480, 0.55, function(dataUrl){
+    pendingInvoiceDataUrl = dataUrl;
+    elInvoicePreview.innerHTML =
+      '<img src="' + dataUrl + '" alt="معاينة الفاتورة">' +
+      '<div class="ip-text">الصورة جاهزة ومربوطة بالعملية</div>' +
+      '<button type="button" class="ip-remove" id="btnRemoveInvoice">✕</button>';
+    elInvoicePreview.classList.add('show');
+    document.getElementById('btnRemoveInvoice').addEventListener('click', function(){
+      pendingInvoiceDataUrl = null;
+      elInvoicePreview.classList.remove('show');
+      elInvoicePreview.innerHTML = '';
+      validateForm();
+    });
+    validateForm();
+  });
+
+  elInvoiceFileInput.value = '';
+});
+
+/* ضغط الصورة عبر canvas: تصغير الأبعاد لحد أقصى maxDim بكسل، وتقليل الجودة لـ quality (0-1) */
+function compressImageFile(file, maxDim, quality, callback){
+  var img = new Image();
+  var reader = new FileReader();
+  reader.onload = function(e){
+    img.onload = function(){
+      var w = img.width, h = img.height;
+      if(w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
+      else if(h >= w && h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      var dataUrl = canvas.toDataURL('image/jpeg', quality);
+      callback(dataUrl);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+elInvoiceModalGo.addEventListener('click', function(){
+  elInvoiceModal.classList.remove('show');
+  if(pendingWaUrl){
+    window.open(pendingWaUrl, '_blank');
+    pendingWaUrl = null;
+  }
+});
+
+/* ===================== سجل اليوم ===================== */
+function renderTodayLog(){
+  var today = todayStr();
+  var todays = records.filter(function(r){ return r.date===today; });
+  todays.sort(function(a,b){ return b.id.localeCompare(a.id); });
+  if(todays.length===0){
+    elTodayLog.innerHTML = '<div class="empty-state">لسه مفيش عمليات النهاردة</div>';
+    return;
+  }
+  var html = '';
+  todays.forEach(function(r){
+    html += '<div class="log-item ' + (r.opType==='مرتجع'?'is-return':'') + '">' +
+      '<div class="l-main">' +
+        '<div class="l-name">' + escapeHtml(r.itemName) + '</div>' +
+        '<div class="l-meta"><span class="badge ' + (r.opType==='بيع'?'sale':'return') + '">' + r.opType + '</span> كمية ' + r.qty + '</div>' +
+      '</div>' +
+      '<div class="l-val">' + (r.net<0?'-':'') + Math.abs(r.net) + '</div>' +
+      '<button class="del-btn" data-id="' + r.id + '" type="button">✕</button>' +
+    '</div>';
+  });
+  elTodayLog.innerHTML = html;
+
+  var delButtons = elTodayLog.querySelectorAll('.del-btn');
+  for(var i=0;i<delButtons.length;i++){
+    delButtons[i].addEventListener('click', function(){
+      var id = this.getAttribute('data-id');
+      if(!window.confirm('تأكيد حذف هذه العملية؟')) return;
+      records = records.filter(function(r){ return r.id!==id; });
+      saveData(records);
+      renderTodayLog();
+    });
+  }
+}
+
+function escapeHtml(s){
+  var div = document.createElement('div');
+  div.textContent = s == null ? '' : String(s);
+  return div.innerHTML;
+}
+
+/* ===================== التقرير ===================== */
+function renderReport(){
+  var grand = records.reduce(function(s,r){ return s+r.net; }, 0);
+  elGrandTotal.textContent = grand.toLocaleString('ar-EG') + ' ج.م';
+  elBtnExport.disabled = records.length===0;
+}
+
+/* ===================== مكتبة بناء ملف Excel (.xlsx) حقيقي بدون أي اعتماد خارجي ===================== */
+var XlsxLite = (function(){
+
+  function crc32(bytes){
+    var table = XlsxLite._crcTable;
+    if(!table){
+      table = [];
+      for(var n=0;n<256;n++){
+        var c = n;
+        for(var k=0;k<8;k++){
+          c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        }
+        table[n] = c >>> 0;
+      }
+      XlsxLite._crcTable = table;
+    }
+    var crc = 0 ^ (-1);
+    for(var i=0;i<bytes.length;i++){
+      crc = (crc >>> 8) ^ table[(crc ^ bytes[i]) & 0xFF];
+    }
+    return (crc ^ (-1)) >>> 0;
+  }
+
+  function strToUtf8Bytes(str){
+    return new TextEncoder().encode(str);
+  }
+
+  function writeUInt32LE(arr, offset, val){
+    arr[offset] = val & 0xFF;
+    arr[offset+1] = (val >>> 8) & 0xFF;
+    arr[offset+2] = (val >>> 16) & 0xFF;
+    arr[offset+3] = (val >>> 24) & 0xFF;
+  }
+  function writeUInt16LE(arr, offset, val){
+    arr[offset] = val & 0xFF;
+    arr[offset+1] = (val >>> 8) & 0xFF;
+  }
+
+  function concatBytes(arrays){
+    var total = 0;
+    for(var i=0;i<arrays.length;i++) total += arrays[i].length;
+    var out = new Uint8Array(total);
+    var pos = 0;
+    for(var j=0;j<arrays.length;j++){
+      out.set(arrays[j], pos);
+      pos += arrays[j].length;
+    }
+    return out;
+  }
+
+  function makeZip(files){
+    var localParts = [];
+    var centralParts = [];
+    var offset = 0;
+
+    files.forEach(function(f){
+      var nameBytes = strToUtf8Bytes(f.name);
+      // f.content ممكن يكون نص (XML) أو Uint8Array (صورة) جاهزة بالفعل
+      var dataBytes = (f.content instanceof Uint8Array) ? f.content : strToUtf8Bytes(f.content);
+      var crc = crc32(dataBytes);
+      var size = dataBytes.length;
+
+      var localHeader = new Uint8Array(30);
+      writeUInt32LE(localHeader, 0, 0x04034b50);
+      writeUInt16LE(localHeader, 4, 20);
+      writeUInt16LE(localHeader, 6, 0x0800); // UTF-8 flag
+      writeUInt16LE(localHeader, 8, 0);
+      writeUInt16LE(localHeader, 10, 0);
+      writeUInt16LE(localHeader, 12, 0);
+      writeUInt32LE(localHeader, 14, crc);
+      writeUInt32LE(localHeader, 18, size);
+      writeUInt32LE(localHeader, 22, size);
+      writeUInt16LE(localHeader, 26, nameBytes.length);
+      writeUInt16LE(localHeader, 28, 0);
+
+      var localEntry = concatBytes([localHeader, nameBytes, dataBytes]);
+      localParts.push(localEntry);
+
+      var centralHeader = new Uint8Array(46);
+      writeUInt32LE(centralHeader, 0, 0x02014b50);
+      writeUInt16LE(centralHeader, 4, 20);
+      writeUInt16LE(centralHeader, 6, 20);
+      writeUInt16LE(centralHeader, 8, 0x0800);
+      writeUInt16LE(centralHeader, 10, 0);
+      writeUInt16LE(centralHeader, 12, 0);
+      writeUInt16LE(centralHeader, 14, 0);
+      writeUInt32LE(centralHeader, 16, crc);
+      writeUInt32LE(centralHeader, 20, size);
+      writeUInt32LE(centralHeader, 24, size);
+      writeUInt16LE(centralHeader, 28, nameBytes.length);
+      writeUInt16LE(centralHeader, 30, 0);
+      writeUInt16LE(centralHeader, 32, 0);
+      writeUInt16LE(centralHeader, 34, 0);
+      writeUInt16LE(centralHeader, 36, 0);
+      writeUInt32LE(centralHeader, 38, 0);
+      writeUInt32LE(centralHeader, 42, offset);
+
+      var centralEntry = concatBytes([centralHeader, nameBytes]);
+      centralParts.push(centralEntry);
+
+      offset += localEntry.length;
+    });
+
+    var localData = concatBytes(localParts);
+    var centralData = concatBytes(centralParts);
+
+    var endRecord = new Uint8Array(22);
+    writeUInt32LE(endRecord, 0, 0x06054b50);
+    writeUInt16LE(endRecord, 4, 0);
+    writeUInt16LE(endRecord, 6, 0);
+    writeUInt16LE(endRecord, 8, files.length);
+    writeUInt16LE(endRecord, 10, files.length);
+    writeUInt32LE(endRecord, 12, centralData.length);
+    writeUInt32LE(endRecord, 16, localData.length);
+    writeUInt16LE(endRecord, 20, 0);
+
+    return concatBytes([localData, centralData, endRecord]);
+  }
+
+  function colLetter(n){
+    var s = '';
+    while(n > 0){
+      var rem = (n-1) % 26;
+      s = String.fromCharCode(65+rem) + s;
+      n = Math.floor((n-1)/26);
+    }
+    return s;
+  }
+
+  function xmlEscape(s){
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&apos;');
+  }
+
+  function buildSheetXML(rows, images, colWidths, rowHeight){
+    // images: [{row (0-based), col (0-based), rId}]
+    var imagesByRow = {};
+    (images||[]).forEach(function(im){
+      imagesByRow[im.row] = im;
+    });
+
+    var rowsXml = '';
+    rows.forEach(function(row, ri){
+      var r = ri+1;
+      var cellsXml = '';
+      row.forEach(function(val, ci){
+        var c = ci+1;
+        var ref = colLetter(c) + r;
+        if(typeof val === 'number' && isFinite(val)){
+          cellsXml += '<c r="' + ref + '"><v>' + val + '</v></c>';
+        } else {
+          var safe = xmlEscape(val === null || val === undefined ? '' : val);
+          cellsXml += '<c r="' + ref + '" t="inlineStr"><is><t xml:space="preserve">' + safe + '</t></is></c>';
+        }
+      });
+      var heightAttr = (imagesByRow[ri] && rowHeight) ? (' ht="' + rowHeight + '" customHeight="1"') : '';
+      rowsXml += '<row r="' + r + '"' + heightAttr + '>' + cellsXml + '</row>';
+    });
+
+    var colsXml = '';
+    if(colWidths && colWidths.length){
+      colsXml = '<cols>';
+      colWidths.forEach(function(w, i){
+        colsXml += '<col min="' + (i+1) + '" max="' + (i+1) + '" width="' + w + '" customWidth="1"/>';
+      });
+      colsXml += '</cols>';
+    }
+
+    var drawingTag = (images && images.length) ? '<drawing r:id="rIdDrawing"/>' : '';
+
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      colsXml +
+      '<sheetData>' + rowsXml + '</sheetData>' +
+      drawingTag +
+      '</worksheet>';
+  }
+
+  function buildDrawingXML(images, colOffsetForImage, imgWidthEMU, imgHeightEMU){
+    // images: [{row (0-based), rId}] - كل صورة بترتبط بصف، وبتتحط في عمود ثابت (colOffsetForImage)
+    var anchors = '';
+    images.forEach(function(im, idx){
+      anchors +=
+        '<xdr:oneCellAnchor>' +
+          '<xdr:from><xdr:col>' + colOffsetForImage + '</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>' + im.row + '</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>' +
+          '<xdr:ext cx="' + imgWidthEMU + '" cy="' + imgHeightEMU + '"/>' +
+          '<xdr:pic>' +
+            '<xdr:nvPicPr><xdr:cNvPr id="' + (idx+2) + '" name="Invoice' + (idx+1) + '" descr="invoice"/><xdr:cNvPicPr/></xdr:nvPicPr>' +
+            '<xdr:blipFill><a:blip r:embed="' + im.rId + '"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill>' +
+            '<xdr:spPr><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr>' +
+          '</xdr:pic>' +
+          '<xdr:clientData/>' +
+        '</xdr:oneCellAnchor>';
+    });
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      anchors +
+      '</xdr:wsDr>';
+  }
+
+  function buildWorkbook(sheets){
+    // sheets: [{name, rows, images?: [{row, bytes, ext}], imageColIndex?: number}]
+    var contentTypesOverrides = '';
+    var workbookSheets = '';
+    var workbookRels = '';
+    var files = [];
+    var hasAnyImage = false;
+
+    sheets.forEach(function(sheet, idx){
+      var sheetNum = idx+1;
+      contentTypesOverrides += '<Override PartName="/xl/worksheets/sheet' + sheetNum + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
+      workbookSheets += '<sheet name="' + xmlEscape(sheet.name) + '" sheetId="' + sheetNum + '" r:id="rId' + sheetNum + '"/>';
+      workbookRels += '<Relationship Id="rId' + sheetNum + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + sheetNum + '.xml"/>';
+
+      var sheetImages = sheet.images || [];
+      var imageRefs = []; // {row, rId} لبناء الـsheet XML والـdrawing XML
+
+      if(sheetImages.length){
+        hasAnyImage = true;
+        var mediaRels = '';
+        sheetImages.forEach(function(im, i){
+          var rId = 'rId' + (i+1);
+          imageRefs.push({row: im.row, rId: rId});
+          files.push({ name: 'xl/media/sheet' + sheetNum + 'image' + (i+1) + '.jpg', content: im.bytes });
+          mediaRels += '<Relationship Id="' + rId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/sheet' + sheetNum + 'image' + (i+1) + '.jpg"/>';
+        });
+
+        contentTypesOverrides += '<Override PartName="/xl/drawings/drawing' + sheetNum + '.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>';
+
+        var imgWidthEMU = 600000;  // ~ 0.66 إنش عرض
+        var imgHeightEMU = 600000; // ~ 0.66 إنش ارتفاع (مربع تقريبي، كافي كمعاينة مصغرة)
+        var colForImg = sheet.imageColIndex !== undefined ? sheet.imageColIndex : (sheet.rows[0] ? sheet.rows[0].length : 0);
+
+        files.push({ name: 'xl/drawings/drawing' + sheetNum + '.xml', content: buildDrawingXML(imageRefs, colForImg, imgWidthEMU, imgHeightEMU) });
+        files.push({ name: 'xl/drawings/_rels/drawing' + sheetNum + '.xml.rels', content:
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+          '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + mediaRels + '</Relationships>' });
+        files.push({ name: 'xl/worksheets/_rels/sheet' + sheetNum + '.xml.rels', content:
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+          '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+          '<Relationship Id="rIdDrawing" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing' + sheetNum + '.xml"/>' +
+          '</Relationships>' });
+      }
+
+      var colWidths = sheet.colWidths || null;
+      var rowHeight = sheetImages.length ? 50 : null;
+      files.push({ name: 'xl/worksheets/sheet' + sheetNum + '.xml', content: buildSheetXML(sheet.rows, imageRefs, colWidths, rowHeight) });
+    });
+
+    var contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+      '<Default Extension="xml" ContentType="application/xml"/>' +
+      (hasAnyImage ? '<Default Extension="jpg" ContentType="image/jpeg"/>' : '') +
+      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+      contentTypesOverrides +
+      '</Types>';
+
+    var rootRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+      '</Relationships>';
+
+    var workbookXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      '<sheets>' + workbookSheets + '</sheets>' +
+      '</workbook>';
+
+    var workbookRelsXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      workbookRels +
+      '</Relationships>';
+
+    files.push({name: '[Content_Types].xml', content: contentTypes});
+    files.push({name: '_rels/.rels', content: rootRels});
+    files.push({name: 'xl/workbook.xml', content: workbookXml});
+    files.push({name: 'xl/_rels/workbook.xml.rels', content: workbookRelsXml});
+
+    return makeZip(files);
+  }
+
+  return { buildWorkbook: buildWorkbook };
+})();
+
+/* ===================== تصدير ملف Excel ===================== */
+function dataUrlToBytes(dataUrl){
+  var base64 = dataUrl.split(',')[1];
+  var binary = atob(base64);
+  var bytes = new Uint8Array(binary.length);
+  for(var i=0;i<binary.length;i++){
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+elBtnExport.addEventListener('click', function(){
+  if(records.length===0){
+    window.alert('مفيش بيانات لتصديرها لسه.');
+    return;
+  }
+
+  var sortedRecords = records.slice().sort(function(a,b){ return a.date.localeCompare(b.date); });
+
+  var detailRows = [
+    ["التاريخ","البائع","المعرض","المندوب","نوع العملية","كود الصنف","اسم الصنف","قيمة عمولة القطعة","الكمية","العمولة الصافية","صورة الفاتورة"]
+  ];
+  var sheetImages = [];
+  sortedRecords.forEach(function(r, idx){
+    var rowIndex0Based = idx + 1; // صف 0 هو العناوين، فالبيانات تبدأ من الصف رقم 1 (0-based) في الورقة
+    detailRows.push([r.date, SELLER_NAME, EXH_NAME, REP_NAME, r.opType, r.code, r.itemName, r.commission, r.qty, r.net, '']);
+    if(r.invoiceImage){
+      try{
+        sheetImages.push({ row: rowIndex0Based, bytes: dataUrlToBytes(r.invoiceImage) });
+      }catch(e){ /* لو فيه مشكلة في صورة معينة، نتجاهلها ونكمل باقي التقرير */ }
+    }
+  });
+  var totalNet = records.reduce(function(s,r){ return s+r.net; }, 0);
+  detailRows.push(["","","","","","","","","الإجمالي", totalNet, ""]);
+
+  try{
+    var zipBytes = XlsxLite.buildWorkbook([
+      {
+        name: 'سجل العمليات',
+        rows: detailRows,
+        images: sheetImages,
+        imageColIndex: 10, // عمود "صورة الفاتورة" (K، 0-based = 10)
+        colWidths: [12,16,16,18,10,10,30,14,8,14,14]
+      }
+    ]);
+
+    var blob = new Blob([zipBytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'تقرير_' + SELLER_NAME + '_' + todayStr() + '.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+    showToast('تم تصدير ملف الإكسل بنجاح');
+  }catch(err){
+    window.alert('حصلت مشكلة أثناء إنشاء ملف الإكسل: ' + err.message);
+  }
+});
+
+/* ===================== تهيئة أولية ===================== */
+updatePreview();
+validateForm();
+</script>
+</body>
+</html>
